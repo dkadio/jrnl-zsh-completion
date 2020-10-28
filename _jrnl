@@ -3,21 +3,47 @@
 typeset -A opt_args
 local context state line
 
+#_arguments -s -S \
+  #  "-ls[displays accessible journals]" \
+  #  "-from+[View entries after this date]:date:" \
+  #  "-to+[View entries before this date]:date:" \
+  #  "-and[Filter by tags using AND (default: OR)]" \
+  #  "-starred[Show only starred entries]" \
+  #  "-n+[Shows the last n entries matching the filter]:count:" \
+  #  "--short[Show only titles or line containing the search tags]" \
+  #  "--tags[Returns a list of all tags and number of occurences]" \
+  #  "--export+[Export your journal to Markdown, JSON or Text]:type:(markdown json text)" \
+  #  "-o+[The output of the file can be provided when using with --export]:file:" \
+  #  "--encrypt[Encrypts your existing journal with a new password]" \
+  #  "--decrypt[Decrypts your journal and stores it in plain text]" \
+  #  "--edit[Opens your editor to edit the selected entries]" \
+  #  "*:[Tag search]:->tags" \
+  #  && return 0
+
 _arguments -s -S \
+  "-h, --help[show this help message and exit]" \
+  "-v, --version[prints version information and exits]" \
+  "--diagnostic[outputs diagnostic information and exits]" \
   "-ls[displays accessible journals]" \
-  "-from+[View entries after this date]:date:" \
-  "-to+[View entries before this date]:date:" \
+  "-d, --debug[execute in debug mode]" \
+  "-from DATE[View entries after this date]" \
+  "-until DATE, -to DATE[View entries before this date]" \
+  "-contains[View entries containing a specific string]:TAG:->tags" \
+  "-on DATE [View entries on this date]" \
   "-and[Filter by tags using AND (default: OR)]" \
   "-starred[Show only starred entries]" \
-  "-n+[Shows the last n entries matching the filter]:count:" \
-  "--short[Show only titles or line containing the search tags]" \
-  "--tags[Returns a list of all tags and number of occurences]" \
-  "--export+[Export your journal to Markdown, JSON or Text]:type:(markdown json text)" \
-  "-o+[The output of the file can be provided when using with --export]:file:" \
-  "--encrypt[Encrypts your existing journal with a new password]" \
-  "--decrypt[Decrypts your journal and stores it in plain text]" \
-  "--edit[Opens your editor to edit the selected entries]" \
-  "*:[Tag search]:->tags" \
+  "-n N[Shows the last n entries matching the filter. '-n 3' and '-3' have the same effect.]" \
+  "-not E..[Exclude entries with these tags]:TAGS:->tags" \
+  "-s, --short[Show only titles or line containing the search tags]:TAG:->tags" \
+  "--tags[Returns a list of all tags and number of occurences]:TAG:->tags" \
+  "--export[Export your journal. TYPE can be boxed, fancy, json, markdown, md, tags, text, txt, xml, or yaml.]:TYPE:(boxed fancy json markdown md tags text txt xml yaml)" \
+  "-o[Optionally specifies output file when using --export. If OUTPUT is a directory, exports each entry into an individual file instead.]" \
+  "--import[Import entries into your journal. TYPE can be jrnl, and it defaults to jrnl if nothing else is specified.]:TYPE:" \
+  "-i[Optionally specifies input file when using --import.]:filname:->files" \
+  "--encrypt[Encrypts your existing journal with a new password]:filename:->files" \
+  "--decrypt[Decrypts your journal and stores it in plain text]:filename:->files" \
+  "--edit[Opens your editor to edit the selected entries.]" \
+  "--delete[Opens an interactive interface for deleting entries.]" \
   && return 0
 
 case $state in
@@ -26,6 +52,15 @@ case $state in
     taglist=(${(f)"$(jrnl --tags | cut -d: -f1 | tr -d ' ')"})
     compadd $taglist
     ;;
+  (files)
+    local fileslist
+    fileslist=($(ls))
+    compadd $fileslist
+    ;;
 esac
 
+
 # vim: ft=zsh
+#
+#
+
