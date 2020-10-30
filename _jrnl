@@ -21,20 +21,22 @@ local context state line
   #  && return 0
 
 _arguments -s -S \
+  "1:[Journal list]:->jrnl" \
   "-h, --help[show this help message and exit]" \
   "-v, --version[prints version information and exits]" \
   "--diagnostic[outputs diagnostic information and exits]" \
   "-ls[displays accessible journals]" \
-  "-d, --debug[execute in debug mode]" \
-  "-from DATE[View entries after this date]" \
-  "-until DATE, -to DATE[View entries before this date]" \
+  "-d;--debug[execute in debug mode]" \
+  "-from[View entries after this date]" \
+  "-until[View entries before this date]"\
+  "-to[View entries before this date]" \
   "-contains[View entries containing a specific string]:TAG:->tags" \
-  "-on DATE [View entries on this date]" \
+  "-on[View entries on this date]" \
   "-and[Filter by tags using AND (default: OR)]" \
   "-starred[Show only starred entries]" \
-  "-n N[Shows the last n entries matching the filter. '-n 3' and '-3' have the same effect.]" \
-  "-not E..[Exclude entries with these tags]:TAGS:->tags" \
-  "-s, --short[Show only titles or line containing the search tags]:TAG:->tags" \
+  "-n[N Shows the last n entries matching the filter. '-n 3' and '-3' have the same effect.]" \
+  "-not[E.. Exclude entries with these tags]:TAGS:->tags" \
+  "-s[or --short Show only titles or line containing the search tags]:TAG:->tags" \
   "--tags[Returns a list of all tags and number of occurences]:TAG:->tags" \
   "--export[Export your journal. TYPE can be boxed, fancy, json, markdown, md, tags, text, txt, xml, or yaml.]:TYPE:(boxed fancy json markdown md tags text txt xml yaml)" \
   "-o[Optionally specifies output file when using --export. If OUTPUT is a directory, exports each entry into an individual file instead.]" \
@@ -47,6 +49,11 @@ _arguments -s -S \
   && return 0
 
 case $state in
+  (jrnl)
+    local jrnllist
+    jrnllist=(${(f)"$(jrnl -ls | tail -n +2 | cut -b 4-11 | tr -d ' ')"})
+    compadd $jrnllist
+    ;;
   (tags)
     local taglist
     taglist=(${(f)"$(jrnl --tags | cut -d: -f1 | tr -d ' ')"})
